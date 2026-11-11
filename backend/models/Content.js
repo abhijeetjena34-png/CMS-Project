@@ -26,10 +26,10 @@ const contentSchema = new mongoose.Schema(
     },
     image: {
       type: String,
+      required: [true, 'Image URL is required'],
       trim: true,
       validate: {
         validator: function (v) {
-          if (!v) return true; // optional
           return /^https?:\/\/.+/.test(v);
         },
         message: 'Image must be a valid URL starting with http:// or https://',
@@ -53,7 +53,7 @@ const contentSchema = new mongoose.Schema(
 
 // Auto-generate slug from title before saving
 contentSchema.pre('save', function (next) {
-  if (this.isModified('title')) {
+  if (this.isModified('title') && this.title) {
     this.slug =
       this.title
         .toLowerCase()
@@ -66,4 +66,3 @@ contentSchema.pre('save', function (next) {
 });
 
 module.exports = mongoose.model('Content', contentSchema);
-
