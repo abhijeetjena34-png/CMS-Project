@@ -14,10 +14,10 @@ const createContent = async (req, res, next) => {
     const { title, description, category, image, content, status } = req.body;
 
     // Basic validation
-    if (!title || !description || !category || !content) {
+    if (!title || !description || !category || !image || !content) {
       return res.status(400).json({
         success: false,
-        message: 'Title, description, category and content are required',
+        message: 'Title, description, category, image and content are required',
       });
     }
 
