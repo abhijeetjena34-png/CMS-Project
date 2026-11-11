@@ -75,17 +75,17 @@ frontend/src/
 
 ### Step 1: Clone & Install
 ```bash
-git clone <repository-url>
-cd Content-Management-System
+git clone https://github.com/abhijeetjena34-png/CMS-Project.git
+cd CMS-Project
 
 # Install all dependencies for both backend and frontend from root
 npm run install:all
 ```
 
 ### Step 2: Seed Database
-Ensure MongoDB is running locally (`mongodb://localhost:27017/cms_internship`), then run:
+Ensure MongoDB is running locally (`mongodb://localhost:27017/cms_project`), then run:
 ```bash
-# Creates the admin user (admin@cms.com / Admin@123456)
+# Creates the initial admin user configured in backend/.env
 npm run seed
 
 # (Optional) Seeds realistic initial articles
@@ -113,7 +113,7 @@ npm run dev
 
 ## 5. Live Demonstration Checklist
 
-- [x] **Admin Login**: Sign in at `http://localhost:5173/admin/login` using `admin@cms.com` / `Admin@123456`.
+- [x] **Admin Login**: Sign in at `http://localhost:5173/admin/login` using your configured administrator credentials.
 - [x] **Dashboard Overview**: Verify live metric counts (Total, Published, Drafts) and the recent content table.
 - [x] **Create Content**: Create a new article with title, description, category, and an image URL. Note the real-time image preview. Save as `Draft`.
 - [x] **Verify Draft Shielding**: Open the public website at `http://localhost:5173/`. Verify the new draft does **not** appear publicly.
@@ -187,9 +187,9 @@ All 4 test suites pass with a **100% success rate (90 of 90 assertions)**:
      - `JWT_EXPIRES_IN`: `7d`
      - `PORT`: `10000`
      - `CLIENT_URL`: `https://<your-frontend>.vercel.app`
-     - `SEED_ADMIN_EMAIL`: `admin@cms.com`
-     - `SEED_ADMIN_PASSWORD`: `Admin@123456`
-     - `SEED_ADMIN_NAME`: `CMS Admin`
+     - `SEED_ADMIN_EMAIL`: `your_admin_email@example.com`
+     - `SEED_ADMIN_PASSWORD`: `your_secure_admin_password`
+     - `SEED_ADMIN_NAME`: `Admin Name`
 
 ### C. Frontend Client (Vercel / Netlify)
 1. In [Vercel](https://vercel.com/), create a new project connected to your repository.

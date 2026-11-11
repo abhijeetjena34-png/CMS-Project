@@ -32,19 +32,19 @@ A professional, production-style full-stack **MERN** Content Management System. 
 |---|---|---|---|
 | **Database** | MongoDB | ≥ 6.0 | Document store for Content and Admin accounts |
 | **ODM** | Mongoose | ^8.4.1 | Schema modeling, pre-save hooks, validation |
-| **Backend** | Node.js + Express.js | Node 22 / Express ^4.19.2 | RESTful API server, routing, middleware |
+| **Backend** | Node.js + Express.js | Node ≥ 18 / Express ^4.19.2 | RESTful API server, routing, middleware |
 | **Security** | bcryptjs + jsonwebtoken | ^2.4.3 / ^9.0.2 | Password hashing & stateless JWT auth |
-| **Frontend** | React 18 + Vite | React 18 / Vite ^8.3.8 | Fast, component-based user interface |
-| **Styling** | Tailwind CSS | ^3.4.17 | Modern responsive utility-first styles |
-| **Routing** | React Router DOM | ^6.23.1 | Declarative client-side routing & route guards |
-| **HTTP Client** | Axios | ^1.7.2 | Interceptors for JWT attachment and 401 handling |
+| **Frontend** | React 19 + Vite | React ^19.3.1 / Vite ^8.3.6 | Fast, component-based user interface |
+| **Styling** | Tailwind CSS | ^3.4.19 | Modern responsive utility-first styles |
+| **Routing** | React Router DOM | ^7.18.5 | Declarative client-side routing & route guards |
+| **HTTP Client** | Axios | ^1.21.1 | Interceptors for JWT attachment and 401 handling |
 
 ---
 
 ## 📁 Project Structure
 
 ```
-cms-internship/
+CMS-Project/
 ├── backend/
 │   ├── config/
 │   │   └── db.js                 # Mongoose connection & error handling
@@ -119,8 +119,8 @@ cms-internship/
 
 ### 1. Clone the repository
 ```bash
-git clone <your-repository-url>
-cd Content-Management-System
+git clone https://github.com/abhijeetjena34-png/CMS-Project.git
+cd CMS-Project
 ```
 
 ### 2. Backend Setup
@@ -130,19 +130,26 @@ cp .env.example .env
 npm install
 ```
 
-Configure your `backend/.env` file:
+Configure your `backend/.env` file with private credentials:
 ```env
-MONGODB_URI=mongodb://localhost:27017/cms_internship
-JWT_SECRET=cms_internship_jwt_secret_dev_only_change_in_prod
+MONGODB_URI=mongodb://localhost:27017/cms_project
+JWT_SECRET=your_unique_secure_jwt_secret_key_here
 JWT_EXPIRES_IN=7d
 PORT=5001
 CLIENT_URL=http://localhost:5173
 NODE_ENV=development
 
-# Seed Admin Credentials
-SEED_ADMIN_EMAIL=admin@cms.com
-SEED_ADMIN_PASSWORD=Admin@123456
-SEED_ADMIN_NAME=CMS Admin
+# Seed Admin Credentials (Configure your private credentials)
+SEED_ADMIN_EMAIL=your_admin_email@example.com
+SEED_ADMIN_PASSWORD=your_secure_admin_password
+SEED_ADMIN_NAME=Admin Name
+```
+
+> 🔒 **Security Notice**: Admin credentials and secrets must be configured privately in `backend/.env`. Never commit `.env` files to version control.
+
+To generate a cryptographically secure 256-bit JWT secret:
+```bash
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 ```
 
 ### 3. Frontend Setup
@@ -161,21 +168,20 @@ VITE_API_BASE_URL=http://localhost:5001/api
 
 ## 👤 Creating the First Admin & Initial Content
 
-Because public registration is disabled by design, use the provided seed scripts:
+Because public registration is disabled by design to protect the system, initialize your administrator account using the seed script:
 
 ```bash
 cd backend
 
-# 1. Create the initial admin account
+# 1. Create the initial admin account (reads credentials from backend/.env)
 npm run seed
 
-# 2. (Optional) Seed realistic sample articles (3 Published, 1 Draft)
+# 2. (Optional) Seed initial sample articles (3 Published, 1 Draft)
 npm run seed:content
 ```
 
-Default Admin Credentials:
-- **Email**: `admin@cms.com`
-- **Password**: `Admin@123456`
+Admin Credentials:
+- Sign in using the `SEED_ADMIN_EMAIL` and `SEED_ADMIN_PASSWORD` values you configured in `backend/.env`.
 
 ---
 
@@ -258,7 +264,7 @@ Follow this 7-step walkthrough to evaluate the entire project:
 
 ### Step 1: Admin Login
 1. Open [http://localhost:5173/admin/login](http://localhost:5173/admin/login) in your browser.
-2. Enter email: `admin@cms.com` and password: `Admin@123456`.
+2. Enter the administrator email and password configured in your `backend/.env`.
 3. Click **Sign In**. The JWT token is saved, and you are redirected to the Admin Dashboard.
 
 ### Step 2: Dashboard Overview
@@ -321,7 +327,7 @@ Follow this 7-step walkthrough to evaluate the entire project:
 
 To push to your remote GitHub repository:
 ```bash
-git remote add origin https://github.com/<your-username>/<your-repo-name>.git
+git remote add origin https://github.com/abhijeetjena34-png/CMS-Project.git
 git branch -M main
 git push -u origin main
 ```
