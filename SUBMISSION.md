@@ -1,6 +1,6 @@
 # Internship Assignment Submission Report
 
-## Project: CMS Internship – Admin Panel & Dynamic Website Integration
+## Project: CMS Project – Admin Panel & Dynamic Website Integration
 
 **Role**: Senior MERN Stack Developer  
 **Status**: Completed, Fully Tested & Production Ready  

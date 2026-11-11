@@ -1,4 +1,4 @@
-# CMS Internship — Admin Panel & Dynamic Website Integration
+# CMS Project — Admin Panel & Dynamic Website Integration
 
 A professional, production-style full-stack **MERN** Content Management System. Built with clean modular architecture, JWT-based admin authentication, complete content CRUD, live image previews, responsive UI design, and dynamic public website integration backed by MongoDB.
 

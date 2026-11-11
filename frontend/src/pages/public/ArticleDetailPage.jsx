@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import api from '../../api/axios';
 import PublicNavbar from '../../components/public/PublicNavbar';
+import PublicFooter from '../../components/public/PublicFooter';
 import Spinner from '../../components/shared/Spinner';
 
 const ArticleDetailPage = () => {
@@ -17,9 +18,9 @@ const ArticleDetailPage = () => {
         setArticle(data.data);
       } catch (err) {
         if (err.response?.status === 404) {
-          setError('Article not found or not published.');
+          setError('The requested article was not found or is currently in draft status.');
         } else {
-          setError('Failed to load article.');
+          setError('Failed to load article. Please check your connection and try again.');
         }
       } finally {
         setLoading(false);
@@ -29,94 +30,124 @@ const ArticleDetailPage = () => {
   }, [idOrSlug]);
 
   const fallbackImg = article
-    ? `https://placehold.co/1200x400/e2e8f0/64748b?text=${encodeURIComponent(article.category)}`
+    ? `https://placehold.co/1200x600/f1f5f9/64748b?text=${encodeURIComponent(article.category || 'Article')}`
     : '';
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-slate-50 flex flex-col">
       <PublicNavbar />
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-10">
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 py-10 flex-1 w-full">
         {loading ? (
-          <Spinner size="lg" className="py-20" />
+          <Spinner size="lg" className="py-24" />
         ) : error ? (
-          <div className="text-center py-20">
-            <p className="text-5xl mb-4">🔍</p>
-            <p className="text-gray-600 text-lg">{error}</p>
-            <Link to="/articles" className="text-blue-600 hover:underline mt-4 inline-block">
-              ← Back to Articles
+          <div className="text-center py-20 bg-white rounded-xl border border-slate-200 p-12">
+            <div className="w-12 h-12 rounded-full bg-slate-100 text-slate-400 mx-auto flex items-center justify-center mb-4">
+              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+              </svg>
+            </div>
+            <h2 className="text-xl font-bold text-slate-900 mb-2">Article Unavailable</h2>
+            <p className="text-slate-600 text-sm max-w-md mx-auto mb-6">{error}</p>
+            <Link
+              to="/articles"
+              className="inline-flex items-center text-sm font-semibold text-blue-600 hover:text-blue-700"
+            >
+              ← Back to All Articles
             </Link>
           </div>
         ) : (
-          <article>
-            {/* Back link */}
-            <Link
-              to="/articles"
-              className="inline-flex items-center text-sm text-blue-600 hover:text-blue-700 mb-6 font-medium"
-            >
-              ← Back to Articles
-            </Link>
+          <article className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-10 shadow-sm">
+            {/* Breadcrumb Navigation */}
+            <nav className="flex items-center gap-2 text-xs text-slate-500 mb-6 flex-wrap">
+              <Link to="/" className="hover:text-blue-600 transition-colors">
+                Home
+              </Link>
+              <span>/</span>
+              <Link to="/articles" className="hover:text-blue-600 transition-colors">
+                Articles
+              </Link>
+              <span>/</span>
+              <span className="text-slate-800 font-medium truncate max-w-xs">{article.title}</span>
+            </nav>
 
-            {/* Category + Date */}
-            <div className="flex items-center gap-3 mb-4">
-              <span className="bg-blue-100 text-blue-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">
+            {/* Category & Date Header */}
+            <div className="flex flex-wrap items-center gap-3 mb-4">
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-blue-50 text-blue-700 border border-blue-100 uppercase tracking-wide">
                 {article.category}
               </span>
-              <span className="text-gray-400 text-sm">
-                {new Date(article.createdAt).toLocaleDateString('en-IN', {
-                  weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
-                })}
-              </span>
+              <div className="flex items-center text-xs text-slate-500 gap-1.5">
+                <svg className="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.253 18.75m3-18.75H3.75a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 003.75 21h16.5A2.25 2.25 0 0022.5 18.75V5.25A2.25 2.25 0 0020.25 3z" />
+                </svg>
+                <time dateTime={article.createdAt}>
+                  {new Date(article.createdAt).toLocaleDateString('en-US', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                  })}
+                </time>
+              </div>
             </div>
 
-            {/* Title */}
-            <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 leading-tight mb-4">
+            {/* Article Title */}
+            <h1 className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight mb-5">
               {article.title}
             </h1>
 
-            {/* Description */}
-            <p className="text-lg text-gray-500 leading-relaxed mb-8 border-l-4 border-blue-400 pl-4">
+            {/* Description Lead */}
+            <p className="text-base sm:text-lg text-slate-600 leading-relaxed mb-8 border-l-4 border-blue-500 pl-4 bg-slate-50/60 py-2 rounded-r">
               {article.description}
             </p>
 
-            {/* Hero Image */}
+            {/* Hero Image Container */}
             {article.image && (
-              <div className="rounded-2xl overflow-hidden mb-8 shadow-sm">
+              <div className="rounded-xl overflow-hidden mb-8 border border-slate-200 bg-slate-100 aspect-[16/9]">
                 <img
                   src={article.image}
                   alt={article.title}
-                  className="w-full h-72 sm:h-96 object-cover"
-                  onError={(e) => { e.target.src = fallbackImg; }}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.currentTarget.src = fallbackImg;
+                  }}
                 />
               </div>
             )}
 
-            {/* Content body */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
-              <div className="prose prose-blue max-w-none text-gray-700 leading-relaxed whitespace-pre-wrap text-base">
+            {/* Article Content Body (Standard Tailwind, no prose plugin dependency) */}
+            <div className="border-t border-slate-100 pt-8 mt-4">
+              <div className="text-slate-800 leading-relaxed text-base sm:text-lg whitespace-pre-wrap font-sans">
                 {article.content}
               </div>
             </div>
 
-            {/* Footer */}
-            <div className="mt-8 flex items-center justify-between pt-6 border-t border-gray-200">
-              <span className="text-sm text-gray-400">
-                Last updated: {new Date(article.updatedAt).toLocaleDateString()}
-              </span>
-              <Link to="/articles" className="text-sm text-blue-600 hover:underline font-medium">
-                ← Browse more articles
+            {/* Article Footer & Navigation */}
+            <div className="mt-12 pt-6 border-t border-slate-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-xs text-slate-500">
+              <p>
+                Last updated on{' '}
+                <span className="font-medium text-slate-700">
+                  {new Date(article.updatedAt || article.createdAt).toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric',
+                  })}
+                </span>
+              </p>
+              <Link
+                to="/articles"
+                className="inline-flex items-center font-semibold text-blue-600 hover:text-blue-700 text-sm"
+              >
+                ← Back to all articles
               </Link>
             </div>
           </article>
         )}
-      </div>
+      </main>
 
-      <footer className="bg-gray-900 text-gray-400 text-center py-6 text-sm mt-8">
-        <p>© 2024 CMS Project · Built with MERN Stack</p>
-      </footer>
+      <PublicFooter />
     </div>
   );
 };
 
 export default ArticleDetailPage;
-
