@@ -1,0 +1,29 @@
+{
+  "name": "cms-internship-root",
+  "version": "1.0.0",
+  "description": "Full-Stack CMS Internship Project - Root Scripts",
+  "scripts": {
+    "install:all": "npm --prefix backend install && npm --prefix frontend install",
+    "seed": "npm --prefix backend run seed",
+    "seed:content": "npm --prefix backend run seed:content",
+    "test": "npm --prefix backend test",
+    "test:phase3": "npm --prefix backend run test:phase3",
+    "test:phase4": "npm --prefix backend run test:phase4",
+    "test:phase5": "npm --prefix backend run test:phase5",
+    "build:frontend": "npm --prefix frontend run build",
+    "dev:backend": "npm --prefix backend run dev",
+    "dev:frontend": "npm --prefix frontend run dev"
+  },
+  "keywords": [
+    "mern",
+    "cms",
+    "internship",
+    "react",
+    "express",
+    "mongodb",
+    "nodejs",
+    "tailwind"
+  ],
+  "author": "",
+  "license": "ISC"
+}
