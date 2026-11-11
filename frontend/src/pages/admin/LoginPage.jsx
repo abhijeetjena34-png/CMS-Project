@@ -92,7 +92,7 @@ const LoginPage = () => {
         </form>
 
         <p className="text-center text-xs text-gray-400 mt-6">
-          CMS Internship Project · Admin Access Only
+          CMS Project · Admin Access Only
         </p>
       </div>
     </div>

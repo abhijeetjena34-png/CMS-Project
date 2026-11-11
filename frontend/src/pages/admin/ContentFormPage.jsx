@@ -57,9 +57,14 @@ const ContentFormPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const { title, description, category, content } = form;
-    if (!title.trim() || !description.trim() || !category || !content.trim()) {
-      setError('Title, description, category and content are required.');
+    const { title, description, category, image, content } = form;
+    if (!title.trim() || !description.trim() || !category || !image.trim() || !content.trim()) {
+      setError('Title, description, category, image URL, and content are required.');
+      return;
+    }
+
+    if (!/^https?:\/\/.+/.test(image.trim())) {
+      setError('Image must be a valid URL starting with http:// or https://');
       return;
     }
 
@@ -169,7 +174,7 @@ const ContentFormPage = () => {
           {/* Image URL + Preview */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Image URL <span className="text-gray-400 text-xs">(optional)</span>
+              Image URL <span className="text-red-500">*</span>
             </label>
             <input
               type="url"
@@ -178,6 +183,7 @@ const ContentFormPage = () => {
               onChange={handleChange}
               placeholder="https://example.com/image.jpg"
               className="input-field"
+              required
             />
             {form.image && !imagePreviewError && (
               <div className="mt-2 rounded-lg overflow-hidden border border-gray-200 h-40 bg-gray-50">

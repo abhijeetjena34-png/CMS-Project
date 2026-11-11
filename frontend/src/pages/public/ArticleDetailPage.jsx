@@ -112,7 +112,7 @@ const ArticleDetailPage = () => {
       </div>
 
       <footer className="bg-gray-900 text-gray-400 text-center py-6 text-sm mt-8">
-        <p>© 2024 CMS Internship Project · Built with MERN Stack</p>
+        <p>© 2024 CMS Project · Built with MERN Stack</p>
       </footer>
     </div>
   );

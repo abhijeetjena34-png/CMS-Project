@@ -70,11 +70,10 @@ const ArticlesPage = () => {
                 <button
                   key={cat}
                   onClick={() => setSelectedCategory(cat)}
-                  className={`text-xs font-semibold px-3 py-1.5 rounded-full border transition-colors ${
-                    selectedCategory === cat
-                      ? 'bg-blue-600 text-white border-blue-600'
-                      : 'bg-white text-gray-600 border-gray-300 hover:border-blue-400'
-                  }`}
+                  className={`text-xs font-semibold px-3 py-1.5 rounded-full border transition-colors ${selectedCategory === cat
+                    ? 'bg-blue-600 text-white border-blue-600'
+                    : 'bg-white text-gray-600 border-gray-300 hover:border-blue-400'
+                    }`}
                 >
                   {cat}
                 </button>
@@ -108,7 +107,7 @@ const ArticlesPage = () => {
       </div>
 
       <footer className="bg-gray-900 text-gray-400 text-center py-6 text-sm mt-8">
-        <p>© 2024 CMS Internship Project · Built with MERN Stack</p>
+        <p>© 2024 CMS Project · Built with MERN Stack</p>
       </footer>
     </div>
   );
