@@ -8,7 +8,10 @@
     "dev": "nodemon server.js",
     "seed": "node utils/seedAdmin.js",
     "seed:content": "node utils/seedContent.js",
-    "test": "node utils/testWorkflow.js"
+    "test": "node utils/testWorkflow.js",
+    "test:phase3": "node utils/testPhase3.js",
+    "test:phase4": "node utils/testPhase4.js",
+    "test:phase5": "node utils/testPhase5.js"
   },
   "keywords": [],
   "author": "",
