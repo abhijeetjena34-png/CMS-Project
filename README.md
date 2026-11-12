@@ -30,11 +30,11 @@ A professional, production-style full-stack **MERN** Content Management System. 
 
 | Layer | Technology | Version | Purpose |
 |---|---|---|---|
-| **Database** | MongoDB | ≥ 6.0 | Document store for Content and Admin accounts |
-| **ODM** | Mongoose | ^8.4.1 | Schema modeling, pre-save hooks, validation |
-| **Backend** | Node.js + Express.js | Node ≥ 18 / Express ^4.19.2 | RESTful API server, routing, middleware |
-| **Security** | bcryptjs + jsonwebtoken | ^2.4.3 / ^9.0.2 | Password hashing & stateless JWT auth |
-| **Frontend** | React 19 + Vite | React ^19.3.1 / Vite ^8.3.6 | Fast, component-based user interface |
+| **Database** | MongoDB | Atlas or local instance (server version not pinned) | Document store for Content and Admin accounts |
+| **ODM** | Mongoose | 8.24.8 (lockfile) | Schema modeling, pre-save hooks, validation |
+| **Backend** | Node.js + Express.js | Express 4.22.3 (lockfile) | RESTful API server, routing, middleware |
+| **Security** | bcryptjs + jsonwebtoken | 2.4.3 / 9.0.3 (lockfile) | Password hashing & stateless JWT auth |
+| **Frontend** | React 19 + Vite | React 19.3.1 / Vite 8.3.8 (lockfile) | Fast, component-based user interface |
 | **Styling** | Tailwind CSS | ^3.4.19 | Modern responsive utility-first styles |
 | **Routing** | React Router DOM | ^7.18.5 | Declarative client-side routing & route guards |
 | **HTTP Client** | Axios | ^1.21.1 | Interceptors for JWT attachment and 401 handling |
@@ -47,7 +47,7 @@ A professional, production-style full-stack **MERN** Content Management System. 
 CMS-Project/
 ├── backend/
 │   ├── config/
-│   │   └── db.js                 # Mongoose connection & error handling
+│   │   └── db.js                 # Cached Mongoose connection promise & error handling
 │   ├── controllers/
 │   │   ├── authController.js     # Admin login & profile handlers
 │   │   └── contentController.js  # Content CRUD & public endpoints
@@ -67,10 +67,10 @@ CMS-Project/
 │   │   ├── testPhase3.js         # Phase 3 MongoDB & Model test suite
 │   │   ├── testPhase4.js         # Phase 4 Auth & Middleware test suite
 │   │   ├── testPhase5.js         # Phase 5 CRUD & Error Handling test suite
-│   │   └── testWorkflow.js       # Complete 11-step end-to-end integration test
+│   │   └── testWorkflow.js       # End-to-end integration workflow
 │   ├── .env.example              # Backend environment template
 │   ├── package.json              # Backend dependencies & npm scripts
-│   └── server.js                 # Express application entry point & CORS
+│   └── server.js                 # Express app export, local listener & CORS
 ├── frontend/
 │   ├── src/
 │   │   ├── api/
@@ -103,6 +103,7 @@ CMS-Project/
 │   ├── .env.example              # Frontend environment template
 │   ├── index.html                # HTML document entry
 │   ├── package.json              # Frontend dependencies
+│   ├── vercel.json               # Vite build settings & React Router SPA fallback
 │   ├── tailwind.config.js        # Tailwind CSS configuration
 │   └── vite.config.js            # Vite configuration
 ├── .gitignore                    # Prevents committing node_modules, .env, and dist
@@ -114,7 +115,7 @@ CMS-Project/
 ## ⚙️ Installation & Setup
 
 ### Prerequisites
-- [Node.js](https://nodejs.org/) (version 18 or higher)
+- [Node.js](https://nodejs.org/) (version 20.19+ or 22.12+, as required by Vite 8)
 - [MongoDB](https://www.mongodb.com/try/download/community) running locally on port 27017 or a [MongoDB Atlas](https://www.mongodb.com/cloud/atlas) cluster URI.
 
 ### 1. Clone the repository
@@ -130,24 +131,11 @@ cp .env.example .env
 npm install
 ```
 
-Configure your `backend/.env` file with private credentials:
-```env
-MONGODB_URI=mongodb://localhost:27017/cms_project
-JWT_SECRET=your_unique_secure_jwt_secret_key_here
-JWT_EXPIRES_IN=7d
-PORT=5001
-CLIENT_URL=http://localhost:5173
-NODE_ENV=development
-
-# Seed Admin Credentials (Configure your private credentials)
-SEED_ADMIN_EMAIL=your_admin_email@example.com
-SEED_ADMIN_PASSWORD=your_secure_admin_password
-SEED_ADMIN_NAME=Admin Name
-```
+Copy the variable names from `backend/.env.example` into `backend/.env` and set their values locally. For local development, point `MONGODB_URI` at your local MongoDB database named `cms_project`; use private values for `JWT_SECRET` and the seed-admin variables. `PORT` should match the frontend API configuration, and `CLIENT_URL` should match the local frontend origin.
 
 > 🔒 **Security Notice**: Admin credentials and secrets must be configured privately in `backend/.env`. Never commit `.env` files to version control.
 
-To generate a cryptographically secure 256-bit JWT secret:
+To generate a cryptographically secure 256-bit JWT secret for your private environment:
 ```bash
 node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 ```
@@ -205,6 +193,34 @@ The React application starts on **http://localhost:5173** (or **http://localhost
 
 ---
 
+## ☁️ Vercel Deployment
+
+Deploy the frontend and backend as **two separate Vercel projects** from this repository. The backend runs the existing Express application as a Vercel Serverless Function; the frontend is a Vite static build.
+
+### Backend API project
+1. Import the repository into Vercel as a new project and set **Root Directory** to `backend`.
+2. Use the `backend` package manifest and lockfile. No separate backend `vercel.json` is required: `backend/server.js` exports the Express app for Vercel and starts `app.listen()` only when run directly with `npm start`.
+3. Configure these production environment variable names in the Vercel project (set their private values in Vercel, not in Git):
+   - `MONGODB_URI` — Atlas connection URI for the existing `cms_project` database.
+   - `JWT_SECRET` — private JWT signing secret.
+   - `CLIENT_URL` — exact production origin of the frontend (scheme and host, without an API path).
+4. Deploy the backend. Existing routes remain under `/api`, including `/api/health`, `/api/auth`, `/api/admin/content`, and `/api/content`.
+
+The database connection is established before API route handling. A module-level promise reuses an in-progress connection across concurrent requests and warm function invocations; an already-open Mongoose connection is reused, and a failed connection attempt clears the promise for a later retry. The health endpoint is registered before the database middleware, so a successful health response alone does not confirm Atlas connectivity.
+
+### Frontend project
+1. Import the same repository as a second Vercel project and set **Root Directory** to `frontend`.
+2. Use the Vite build command `npm run build` and output directory `dist` (also recorded in `frontend/vercel.json`).
+3. Set the production environment variable `VITE_API_BASE_URL` to the deployed backend origin followed by `/api` (for example, `https://<backend-domain>/api`). Do not use localhost for the production value.
+4. Deploy the frontend. The `frontend/vercel.json` rewrite sends client-side routes to `index.html`, supporting direct visits and browser refreshes.
+5. Set the backend `CLIENT_URL` to the frontend's exact production origin. If it changes, update the backend environment variable and redeploy the backend.
+
+Production CORS permits the configured `CLIENT_URL` and requests without an `Origin` header; localhost origins are also allowed for development. Preview deployments on other origins are not automatically allowed. Add a preview origin only if needed, using an intentional CORS configuration change.
+
+Deployment is not complete until both projects are deployed and the production API, authentication, content behavior, CORS, and frontend routes have been tested.
+
+---
+
 ## 🧪 Automated Testing Suite
 
 Four comprehensive test suites are provided to verify all layers of the application:
@@ -212,7 +228,7 @@ Four comprehensive test suites are provided to verify all layers of the applicat
 ```bash
 cd backend
 
-# Run complete end-to-end workflow (11-step lifecycle test)
+# Run the complete end-to-end integration workflow
 npm test
 
 # Run Phase 3: MongoDB connection and Content model validation tests
@@ -312,7 +328,7 @@ Follow this 7-step walkthrough to evaluate the entire project:
 - **Password Hashing**: Passwords are never stored in plain text; hashed using `bcryptjs` with 12 salt rounds.
 - **Sensitive Field Shielding**: Schema defines `select: false` on the password field, ensuring it is never leaked in queries or API responses.
 - **No Public Registration**: Prevents unauthorized accounts from being created.
-- **Strict CORS Policy**: Restricted to configured frontend origins.
+- **CORS Policy**: Allows the configured production frontend origin and development localhost origins.
 - **Environment Isolation**: All credentials, database URLs, and JWT secrets are kept in `.env` files and omitted from version control via `.gitignore`.
 
 ---
@@ -322,8 +338,8 @@ Follow this 7-step walkthrough to evaluate the entire project:
 - [x] Backend and frontend code fully modularized and functional.
 - [x] `.gitignore` verified to exclude `.env`, `node_modules/`, and build artifacts.
 - [x] Environment example files (`backend/.env.example`, `frontend/.env.example`) provided with clear instructions.
-- [x] All 18 automated integration tests passing.
-- [x] No sensitive credentials or secrets committed to git history.
+- [ ] Run the provided automated test scripts against the intended database before release; test results are not asserted by this checklist.
+- [ ] Keep real credentials and secrets out of all commits; `.env` files must remain ignored.
 
 To push to your remote GitHub repository:
 ```bash
