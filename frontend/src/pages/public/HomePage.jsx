@@ -5,6 +5,7 @@ import PublicNavbar from '../../components/public/PublicNavbar';
 import PublicFooter from '../../components/public/PublicFooter';
 import ContentCard from '../../components/public/ContentCard';
 import Spinner from '../../components/shared/Spinner';
+import adminUrl from '../../config/urls';
 
 const HomePage = () => {
   const [featured, setFeatured] = useState([]);
@@ -58,12 +59,12 @@ const HomePage = () => {
               </svg>
             </Link>
 
-            <Link
-              to="/admin/login"
+            <a
+              href={adminUrl}
               className="w-full sm:w-auto inline-flex items-center justify-center bg-white text-slate-700 font-semibold px-6 py-3 rounded-lg border border-slate-300 hover:bg-slate-50 transition-colors shadow-sm"
             >
               <span>Admin Management</span>
-            </Link>
+            </a>
           </div>
         </div>
       </section>
@@ -103,12 +104,12 @@ const HomePage = () => {
             <p className="text-slate-500 text-sm max-w-md mx-auto mb-6">
               Content created and published in the Admin Panel will automatically appear here.
             </p>
-            <Link
-              to="/admin/login"
+            <a
+              href={adminUrl}
               className="inline-flex items-center text-sm font-semibold text-blue-600 hover:text-blue-700"
             >
               Go to Admin Panel →
-            </Link>
+            </a>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">

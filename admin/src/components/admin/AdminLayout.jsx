@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
 import AdminSidebar from './AdminSidebar';
 import { useAuth } from '../../context/AuthContext';
+import publicUrl from '../../config/urls';
 
 const AdminLayout = ({ children }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -54,14 +54,14 @@ const AdminLayout = ({ children }) => {
           </div>
 
           <div className="flex items-center gap-2">
-            <Link
-              to="/"
+            <a
+              href={publicUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="text-xs text-slate-400 hover:text-white px-2.5 py-1 rounded bg-slate-800 transition-colors"
             >
               Live Site ↗
-            </Link>
+            </a>
             <div className="w-7 h-7 rounded-full bg-blue-600/30 text-blue-400 border border-blue-500/40 flex items-center justify-center text-xs font-bold">
               {admin?.name?.charAt(0)?.toUpperCase() || 'A'}
             </div>

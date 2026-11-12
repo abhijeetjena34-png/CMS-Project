@@ -1,4 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
+import adminUrl from '../../config/urls';
 
 const PublicNavbar = () => {
   const location = useLocation();
@@ -57,12 +58,12 @@ const PublicNavbar = () => {
             Articles
           </Link>
           <div className="h-4 w-[1px] bg-slate-200 mx-1 sm:mx-2 hidden sm:block" />
-          <Link
-            to="/admin/login"
+          <a
+            href={adminUrl}
             className="text-sm bg-slate-900 text-white px-3.5 py-1.5 rounded-lg hover:bg-slate-800 font-medium transition-colors shadow-sm ml-1"
           >
             Admin Portal
-          </Link>
+          </a>
         </nav>
       </div>
     </header>

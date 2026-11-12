@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import publicUrl from '../../config/urls';
 
 const LoginPage = () => {
   const [form, setForm] = useState({ email: '', password: '' });
@@ -39,12 +40,12 @@ const LoginPage = () => {
       <div className="relative w-full max-w-md">
         {/* Back Link */}
         <div className="mb-6 text-center">
-          <Link
-            to="/"
+          <a
+            href={publicUrl}
             className="inline-flex items-center text-xs font-semibold text-slate-400 hover:text-white transition-colors"
           >
             ← Return to Public Website
-          </Link>
+          </a>
         </div>
 
         {/* Card */}
