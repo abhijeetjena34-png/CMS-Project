@@ -1,4 +1,4 @@
-# CMS Project — Admin Panel & Dynamic Website Integration
+# CMS Project — Separate Admin Portal, Public Website & API
 
 A professional, production-style full-stack **MERN** Content Management System. Built with clean modular architecture, JWT-based admin authentication, complete content CRUD, live image previews, responsive UI design, and dynamic public website integration backed by MongoDB.
 
@@ -37,7 +37,7 @@ A professional, production-style full-stack **MERN** Content Management System. 
 | **Frontend** | React 19 + Vite | React 19.3.1 / Vite 8.3.8 (lockfile) | Fast, component-based user interface |
 | **Styling** | Tailwind CSS | ^3.4.19 | Modern responsive utility-first styles |
 | **Routing** | React Router DOM | ^7.18.5 | Declarative client-side routing & route guards |
-| **HTTP Client** | Axios | ^1.21.1 | Interceptors for JWT attachment and 401 handling |
+| **HTTP Client** | Axios | ^1.21.1 | Admin JWT interceptors and public REST requests |
 
 ---
 
@@ -45,6 +45,22 @@ A professional, production-style full-stack **MERN** Content Management System. 
 
 ```
 CMS-Project/
+├── admin/
+│   ├── src/
+│   │   ├── api/axios.js               # Admin API client with JWT handling
+│   │   ├── components/admin/          # Admin layout and navigation
+│   │   ├── components/shared/          # ProtectedRoute and Spinner
+│   │   ├── context/AuthContext.jsx    # Admin login and token state
+│   │   ├── pages/admin/               # Login, dashboard and content CRUD
+│   │   ├── App.jsx                    # Admin-only routes
+│   │   └── index.css                  # Shared Tailwind styling
+│   ├── .env.example
+│   ├── index.html
+│   ├── package.json
+│   ├── postcss.config.js
+│   ├── tailwind.config.js
+│   ├── vercel.json                    # Admin SPA fallback
+│   └── vite.config.js
 ├── backend/
 │   ├── config/
 │   │   └── db.js                 # Cached Mongoose connection promise & error handling
@@ -74,38 +90,28 @@ CMS-Project/
 ├── frontend/
 │   ├── src/
 │   │   ├── api/
-│   │   │   └── axios.js          # Axios instance with request/response interceptors
+│   │   │   └── axios.js               # Public API client
 │   │   ├── components/
-│   │   │   ├── admin/
-│   │   │   │   ├── AdminLayout.jsx   # Admin page container with sidebar
-│   │   │   │   └── AdminSidebar.jsx  # Sidebar navigation with active indicator & logout
 │   │   │   ├── public/
-│   │   │   │   ├── ContentCard.jsx   # Article card component
-│   │   │   │   └── PublicNavbar.jsx  # Public site navigation header
+│   │   │   │   ├── ContentCard.jsx
+│   │   │   │   ├── PublicFooter.jsx
+│   │   │   │   └── PublicNavbar.jsx
 │   │   │   └── shared/
-│   │   │       ├── ProtectedRoute.jsx# Auth route guard (redirects to /admin/login)
-│   │   │       └── Spinner.jsx       # Reusable loading spinner
-│   │   ├── context/
-│   │   │   └── AuthContext.jsx   # Global authentication state provider
+│   │   │       └── Spinner.jsx
 │   │   ├── pages/
-│   │   │   ├── admin/
-│   │   │   │   ├── ContentFormPage.jsx # Add & Edit content form with live image preview
-│   │   │   │   ├── ContentListPage.jsx # Content manager table with status toggle & delete
-│   │   │   │   ├── DashboardPage.jsx   # Admin dashboard with live stats
-│   │   │   │   └── LoginPage.jsx       # Clean admin sign-in form
-│   │   │   └── public/
-│   │   │       ├── ArticleDetailPage.jsx # Individual article view
-│   │   │       ├── ArticlesPage.jsx     # Search & category filtered articles listing
-│   │   │       └── HomePage.jsx         # Public landing page with hero & latest articles
-│   │   ├── App.jsx               # Route definitions
-│   │   ├── index.css             # Tailwind base & component utilities
-│   │   └── main.jsx              # Application bootstrap
-│   ├── .env.example              # Frontend environment template
-│   ├── index.html                # HTML document entry
-│   ├── package.json              # Frontend dependencies
-│   ├── vercel.json               # Vite build settings & React Router SPA fallback
-│   ├── tailwind.config.js        # Tailwind CSS configuration
-│   └── vite.config.js            # Vite configuration
+│   │   │   └── public/                 # Home, articles and article detail pages
+│   │   ├── config/urls.js              # External admin portal link
+│   │   ├── App.jsx                     # Public-only routes
+│   │   ├── index.css
+│   │   └── main.jsx
+│   ├── .env.example
+│   ├── index.html
+│   ├── package.json
+│   ├── postcss.config.js
+│   ├── tailwind.config.js
+│   ├── vercel.json                     # Public SPA fallback
+│   └── vite.config.js
+├── package.json                        # Root local install/dev/build scripts
 ├── .gitignore                    # Prevents committing node_modules, .env, and dist
 └── README.md                     # Comprehensive project documentation
 ```
@@ -131,7 +137,7 @@ cp .env.example .env
 npm install
 ```
 
-Copy the variable names from `backend/.env.example` into `backend/.env` and set their values locally. For local development, point `MONGODB_URI` at your local MongoDB database named `cms_project`; use private values for `JWT_SECRET` and the seed-admin variables. `PORT` should match the frontend API configuration, and `CLIENT_URL` should match the local frontend origin.
+Copy the variable names from `backend/.env.example` into `backend/.env` and set their values locally. For local development, point `MONGODB_URI` at your local MongoDB database named `cms_project`; use private values for `JWT_SECRET` and the seed-admin variables. `PORT` should be `5001`; `CLIENT_URL` and `ADMIN_URL` should match the local public and admin origins.
 
 > 🔒 **Security Notice**: Admin credentials and secrets must be configured privately in `backend/.env`. Never commit `.env` files to version control.
 
@@ -140,16 +146,25 @@ To generate a cryptographically secure 256-bit JWT secret for your private envir
 node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 ```
 
-### 3. Frontend Setup
+### 3. Frontend and Admin Setup
 ```bash
 cd ../frontend
 cp .env.example .env
 npm install
+cd ../admin
+cp .env.example .env
+npm install
 ```
 
-Configure your `frontend/.env` file:
+Configure `frontend/.env` and `admin/.env`:
 ```env
+# frontend/.env
 VITE_API_BASE_URL=http://localhost:5001/api
+VITE_ADMIN_URL=http://localhost:5174
+
+# admin/.env
+VITE_API_BASE_URL=http://localhost:5001/api
+VITE_PUBLIC_URL=http://localhost:5173
 ```
 
 ---
@@ -184,18 +199,19 @@ npm start          # Standard Node execution
 ```
 The backend API starts on **http://localhost:5001**.
 
-### Start the Frontend Client
+### Start the public website and admin portal
+Run each command in its own terminal from the repository root:
 ```bash
-cd frontend
-npm run dev
+npm run dev:frontend
+npm run dev:admin
 ```
-The React application starts on **http://localhost:5173** (or **http://localhost:5174**).
+The public website is at **http://localhost:5173** and the admin portal is at **http://localhost:5174/admin/login**. Use `npm run dev:backend` for the API.
 
 ---
 
 ## ☁️ Vercel Deployment
 
-Deploy the frontend and backend as **two separate Vercel projects** from this repository. The backend runs the existing Express application as a Vercel Serverless Function; the frontend is a Vite static build.
+Deploy the admin portal, public website, and backend as **three separate Vercel projects** from this repository. The two React applications are Vite static builds; the existing Express backend runs as a Vercel Serverless Function.
 
 ### Backend API project
 1. Import the repository into Vercel as a new project and set **Root Directory** to `backend`.
@@ -204,26 +220,35 @@ Deploy the frontend and backend as **two separate Vercel projects** from this re
    - `MONGODB_URI` — Atlas connection URI for the existing `cms_project` database.
    - `JWT_SECRET` — private JWT signing secret.
    - `CLIENT_URL` — exact production origin of the frontend (scheme and host, without an API path).
+   - `ADMIN_URL` — exact production origin of the admin app.
 4. Deploy the backend. Existing routes remain under `/api`, including `/api/health`, `/api/auth`, `/api/admin/content`, and `/api/content`.
 
 The database connection is established before API route handling. A module-level promise reuses an in-progress connection across concurrent requests and warm function invocations; an already-open Mongoose connection is reused, and a failed connection attempt clears the promise for a later retry. The health endpoint is registered before the database middleware, so a successful health response alone does not confirm Atlas connectivity.
 
-### Frontend project
-1. Import the same repository as a second Vercel project and set **Root Directory** to `frontend`.
+### Admin project
+1. Import the repository as a separate Vercel project and set **Root Directory** to `admin`.
+2. Use **Build Command** `npm run build` and **Output Directory** `dist` (configured in `admin/vercel.json`).
+3. Configure `VITE_API_BASE_URL` as the deployed backend origin ending in `/api`, and `VITE_PUBLIC_URL` as the exact deployed public frontend origin.
+4. `admin/vercel.json` provides the SPA fallback so admin routes survive direct visits and refreshes.
+
+### Public frontend project
+1. Import the same repository as a third Vercel project and set **Root Directory** to `frontend`.
 2. Use the Vite build command `npm run build` and output directory `dist` (also recorded in `frontend/vercel.json`).
-3. Set the production environment variable `VITE_API_BASE_URL` to the deployed backend origin followed by `/api` (for example, `https://<backend-domain>/api`). Do not use localhost for the production value.
+3. Configure `VITE_API_BASE_URL` as the deployed backend origin ending in `/api`, and `VITE_ADMIN_URL` as the exact deployed admin origin. Do not use localhost for production values.
 4. Deploy the frontend. The `frontend/vercel.json` rewrite sends client-side routes to `index.html`, supporting direct visits and browser refreshes.
-5. Set the backend `CLIENT_URL` to the frontend's exact production origin. If it changes, update the backend environment variable and redeploy the backend.
+5. Set backend `CLIENT_URL` and `ADMIN_URL` to the exact public and admin production origins. If either changes, update the backend environment and redeploy it.
 
-Production CORS permits the configured `CLIENT_URL` and requests without an `Origin` header; localhost origins are also allowed for development. Preview deployments on other origins are not automatically allowed. Add a preview origin only if needed, using an intentional CORS configuration change.
+Backend CORS permits only the exact configured `CLIENT_URL` and `ADMIN_URL` browser origins. Local development works by setting those variables to the local public/admin origins in `backend/.env`; preview or other origins are not automatically allowed. Requests without an `Origin` header (for example, server-to-server calls) do not receive browser CORS access.
 
-Deployment is not complete until both projects are deployed and the production API, authentication, content behavior, CORS, and frontend routes have been tested.
+Deployment is not complete until all three projects are deployed and the production API, authentication, content behavior, CORS, and app routes have been tested.
 
 ---
 
 ## 🧪 Automated Testing Suite
 
 Four comprehensive test suites are provided to verify all layers of the application:
+
+The end-to-end workflow creates, updates, publishes, and deletes content; run it only against an isolated test database, not production Atlas.
 
 ```bash
 cd backend
@@ -279,7 +304,7 @@ npm run test:phase5
 Follow this 7-step walkthrough to evaluate the entire project:
 
 ### Step 1: Admin Login
-1. Open [http://localhost:5173/admin/login](http://localhost:5173/admin/login) in your browser.
+1. Open [http://localhost:5174/admin/login](http://localhost:5174/admin/login) in your browser.
 2. Enter the administrator email and password configured in your `backend/.env`.
 3. Click **Sign In**. The JWT token is saved, and you are redirected to the Admin Dashboard.
 
@@ -328,16 +353,16 @@ Follow this 7-step walkthrough to evaluate the entire project:
 - **Password Hashing**: Passwords are never stored in plain text; hashed using `bcryptjs` with 12 salt rounds.
 - **Sensitive Field Shielding**: Schema defines `select: false` on the password field, ensuring it is never leaked in queries or API responses.
 - **No Public Registration**: Prevents unauthorized accounts from being created.
-- **CORS Policy**: Allows the configured production frontend origin and development localhost origins.
+- **CORS Policy**: Allows only the configured public and admin origins.
 - **Environment Isolation**: All credentials, database URLs, and JWT secrets are kept in `.env` files and omitted from version control via `.gitignore`.
 
 ---
 
 ## 📦 GitHub Submission Checklist
 
-- [x] Backend and frontend code fully modularized and functional.
+- [x] Backend, admin, and public frontend are separate applications.
 - [x] `.gitignore` verified to exclude `.env`, `node_modules/`, and build artifacts.
-- [x] Environment example files (`backend/.env.example`, `frontend/.env.example`) provided with clear instructions.
+- [x] Safe environment example files are provided for backend, admin, and public frontend.
 - [ ] Run the provided automated test scripts against the intended database before release; test results are not asserted by this checklist.
 - [ ] Keep real credentials and secrets out of all commits; `.env` files must remain ignored.
 

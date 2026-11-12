@@ -1,5 +1,6 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import publicUrl from '../../config/urls';
 
 const AdminSidebar = ({ onClose }) => {
   const { admin, logout } = useAuth();
@@ -114,8 +115,8 @@ const AdminSidebar = ({ onClose }) => {
 
         {/* External Public Website Link */}
         <div className="pt-4 border-t border-slate-800 mt-4">
-          <Link
-            to="/"
+          <a
+            href={publicUrl}
             target="_blank"
             rel="noopener noreferrer"
             onClick={handleNavClick}
@@ -125,7 +126,7 @@ const AdminSidebar = ({ onClose }) => {
               <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
             </svg>
             <span>Live Website</span>
-          </Link>
+          </a>
         </div>
       </nav>
 

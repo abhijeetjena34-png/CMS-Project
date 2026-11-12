@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import adminUrl from '../../config/urls';
 
 const PublicFooter = () => {
   const currentYear = new Date().getFullYear();
@@ -21,9 +22,9 @@ const PublicFooter = () => {
             <Link to="/articles" className="hover:text-white transition-colors">
               Articles
             </Link>
-            <Link to="/admin/login" className="hover:text-white transition-colors">
+            <a href={adminUrl} className="hover:text-white transition-colors">
               Admin Portal
-            </Link>
+            </a>
           </div>
         </div>
 
@@ -37,4 +38,3 @@ const PublicFooter = () => {
 };
 
 export default PublicFooter;
-

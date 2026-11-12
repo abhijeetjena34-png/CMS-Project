@@ -13,17 +13,14 @@ const app = express();
 
 // ─── Middleware ────────────────────────────────────────────────────
 const allowedOrigins = [
-  process.env.CLIENT_URL || 'http://localhost:5173',
-  'http://localhost:5173',
-  'http://localhost:5174',
-  'http://localhost:5175',
-];
+  process.env.CLIENT_URL,
+  process.env.ADMIN_URL,
+].filter(Boolean);
 
 app.use(
   cors({
     origin: function (origin, callback) {
-      // allow requests with no origin (like mobile apps, curl, or Postman)
-      if (!origin || allowedOrigins.indexOf(origin) !== -1 || /^http:\/\/localhost:\d+$/.test(origin)) {
+      if (!origin || allowedOrigins.includes(origin)) {
         return callback(null, true);
       }
       return callback(new Error('Not allowed by CORS'));
