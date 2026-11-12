@@ -9,9 +9,6 @@ const authRoutes = require('./routes/authRoutes');
 const adminContentRoutes = require('./routes/adminContentRoutes');
 const publicContentRoutes = require('./routes/publicContentRoutes');
 
-// Connect to MongoDB
-connectDB();
-
 const app = express();
 
 // ─── Middleware ────────────────────────────────────────────────────
@@ -47,6 +44,10 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+app.use((req, res, next) => {
+  connectDB().then(() => next()).catch(next);
+});
+
 // ─── API Routes ───────────────────────────────────────────────────
 app.use('/api/auth', authRoutes);
 app.use('/api/admin/content', adminContentRoutes);
@@ -64,9 +65,19 @@ app.use((req, res) => {
 app.use(errorHandler);
 
 // ─── Start Server ─────────────────────────────────────────────────
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
-  console.log(`📋 Health check: http://localhost:${PORT}/api/health`);
-});
+if (require.main === module) {
+  const PORT = process.env.PORT || 5000;
+  connectDB()
+    .then(() => {
+      app.listen(PORT, () => {
+        console.log(`🚀 Server running on http://localhost:${PORT}`);
+        console.log(`📋 Health check: http://localhost:${PORT}/api/health`);
+      });
+    })
+    .catch((error) => {
+      console.error(`❌ MongoDB Connection Error: ${error.message}`);
+      process.exitCode = 1;
+    });
+}
 
+module.exports = app;
